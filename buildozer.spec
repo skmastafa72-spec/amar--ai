@@ -1,14 +1,24 @@
-[app]
-title = Amar AI
-package.name = amarai
-package.domain = com.skmastafa72.amarai
-source.dir = .
-version = 1.0
-requirements = python3,kivy,requests
-orientation = portrait
-android.permissions = INTERNET
-android.icon = icon.png
-
-[buildozer]
-log_level = 2
-warn_on_root = 1
+name: Build APK
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y zip unzip openjdk-17-jdk autoconf libtool pkg-config zlib1g-dev libncurses6 libtinfo6 cmake libffi-dev libssl-dev
+          pip install --upgrade pip
+          pip install buildozer cython
+      - name: Build with Buildozer
+        run: |
+          buildozer android debug
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: amar-ai-apk
+          path: bin/*.apk
