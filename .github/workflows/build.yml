@@ -7,28 +7,24 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-      - name: Install dependencies
+      - name: Install deps
         run: |
           sudo apt update
-          sudo apt install -y openjdk-17-jdk zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev cmake libffi-dev libssl-dev
+          sudo apt install -y openjdk-17-jdk zip unzip autoconf libtool pkg-config zlib1g-dev libncurses5-dev cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install cython==0.29.33 buildozer
-      - name: Build APK First Try
+      - name: Build
         run: |
           buildozer android debug || true
-      - name: Accept Licenses
-        run: |
+          mkdir -p ~/.android
+          touch ~/.android/repositories.cfg
           yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/bin/sdkmanager --licenses || true
-          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/bin/sdkmanager --licenses || true
-      - name: Build APK Final
-        run: |
+          ~/.buildozer/android/platform/android-sdk/cmdline-tools/bin/sdkmanager "build-tools;33.0.2" "platforms;android-33" || true
           buildozer android debug
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v4
         with:
           name: amar-ai-apk
           path: bin/*.apk
