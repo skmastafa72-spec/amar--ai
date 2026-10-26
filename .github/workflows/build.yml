@@ -14,12 +14,18 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y openjdk-17-jdk python3-pip zip unzip
+          sudo apt install -y openjdk-17-jdk zip unzip python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev cmake libffi-dev libssl-dev
           pip install --upgrade pip
           pip install cython==0.29.33 buildozer
-      - name: Build APK
+      - name: Build APK First Try
         run: |
-          yes | sdkmanager --licenses || true
+          buildozer android debug || true
+      - name: Accept Licenses
+        run: |
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/bin/sdkmanager --licenses || true
+          yes | ~/.buildozer/android/platform/android-sdk/cmdline-tools/bin/sdkmanager --licenses || true
+      - name: Build APK Final
+        run: |
           buildozer android debug
       - name: Upload APK
         uses: actions/upload-artifact@v4
