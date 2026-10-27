@@ -2,14 +2,17 @@ name: Build APK
 on: [push]
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
-      - uses: actions/checkout@v2
-      - uses: ArtemSBulgakov/buildozer-action@v1
+      - uses: actions/checkout@v4
+      - name: Build with Buildozer
+        uses: digreat/buildozer-action@v2
         with:
           command: buildozer android debug
           buildozer_version: master
-      - uses: actions/upload-artifact@v4
+          python_version: 3.10
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
         with:
           name: amar-ai-apk
           path: bin/*.apk
