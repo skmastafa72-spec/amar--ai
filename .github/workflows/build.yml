@@ -1,35 +1,23 @@
 name: Build APK
-on: [push]
+on: [push, workflow_dispatch]
 jobs:
   build:
     runs-on: ubuntu-22.04
     steps:
       - uses: actions/checkout@v4
-
-      - name: Setup Python
-        uses: actions/setup-python@v5
+      - uses: actions/setup-python@v5
         with:
           python-version: '3.10'
-
-      - name: Install system deps
-        run: |
-          sudo apt update
-          sudo apt install -y openjdk-17-jdk unzip zip git
-          sudo apt install -y python3-pip autoconf libtool pkg-config zlib1g-dev libncurses5-dev libncursesw5-dev libtinfo5 cmake libffi-dev libssl-dev
-
-      - name: Install Buildozer master
-        run: |
-          pip install --upgrade pip
-          pip install Cython==0.29.36
-          pip install https://github.com/kivy/buildozer/archive/master.zip
-          pip install https://github.com/kivy/python-for-android/archive/master.zip
-
-      - name: Build APK
-        run: |
-          yes | buildozer android debug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
+      - uses: actions/setup-java@v4
         with:
-          name: amar-ai-apk
+          distribution: 'temurin'
+          java-version: '17'
+      - run: |
+          sudo apt update
+          sudo apt install -y libffi-dev libssl-dev
+          pip install Cython==0.29.36 buildozer
+          yes | buildozer android debug
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Amar-AI-APK
           path: bin/*.apk
